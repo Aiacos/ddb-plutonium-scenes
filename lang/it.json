@@ -1,0 +1,38 @@
+{
+	"DDB_PLUT": {
+		"FolderName": "Creature Scene DDB",
+		"ContextMenu": {
+			"Populate": "Posiziona mostri e PNG DDB"
+		},
+		"Settings": {
+			"MonsterSource": {
+				"Name": "Fonte di mostri e PNG",
+				"Hint": "Da dove arrivano le creature posizionate sulle scene importate. Compendi ufficiali usa i compendi Wizards of the Coast installati nel mondo (la selezione di NPC Token Replacer, se attivo). Plutonium importa la creatura da 5etools e la tokenizza con il dynamic ring.",
+				"Compendium": "Compendi ufficiali",
+				"Plutonium": "Plutonium (5etools) con dynamic ring"
+			},
+			"Fallback": {
+				"Name": "Usa l'altra fonte se manca",
+				"Hint": "Se una creatura non si trova nella fonte scelta, prova l'altra (serve Plutonium attivo)."
+			},
+			"DynamicRing": {
+				"Name": "Dynamic ring per le creature Plutonium",
+				"Hint": "Attiva il dynamic ring del token sulle creature importate tramite Plutonium."
+			},
+			"AutoPopulate": {
+				"Name": "Posiziona le creature all'import della scena",
+				"Hint": "Quando viene creata una scena con dati creature DDB (es. dal map importer di Plutonium), posiziona automaticamente mostri e PNG. Altrimenti usa il menu contestuale della scena."
+			}
+		},
+		"Notify": {
+			"NoData": "Questa scena non ha dati creature DDB.",
+			"AlreadyPopulated": "Questa scena è già stata popolata. Usa il menu contestuale della scena per posizionare di nuovo le creature.",
+			"Start": "Posiziono {count} creature DDB su {scene}...",
+			"NoPlutonium": "Plutonium non è attivo: uso i compendi ufficiali."
+		},
+		"Report": {
+			"Placed": "Posizionate {placed}/{total} creature DDB su <strong>{scene}</strong>.",
+			"Missing": "Non trovate in nessuna fonte abilitata:"
+		}
+	}
+}

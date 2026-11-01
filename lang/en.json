@@ -1,0 +1,38 @@
+{
+	"DDB_PLUT": {
+		"FolderName": "DDB Scene Creatures",
+		"ContextMenu": {
+			"Populate": "Place DDB monsters & NPCs"
+		},
+		"Settings": {
+			"MonsterSource": {
+				"Name": "Monster & NPC source",
+				"Hint": "Where the creatures placed on imported scenes come from. Official compendiums uses the Wizards of the Coast compendiums installed in this world (the selection of NPC Token Replacer, when active). Plutonium imports the 5etools creature and tokenizes it with a dynamic ring.",
+				"Compendium": "Official compendiums",
+				"Plutonium": "Plutonium (5etools) with dynamic ring"
+			},
+			"Fallback": {
+				"Name": "Fall back to the other source",
+				"Hint": "If a creature is not found in the chosen source, try the other one (Plutonium must be active)."
+			},
+			"DynamicRing": {
+				"Name": "Dynamic ring for Plutonium creatures",
+				"Hint": "Enable the token dynamic ring on creatures imported through Plutonium."
+			},
+			"AutoPopulate": {
+				"Name": "Place creatures on scene import",
+				"Hint": "When a scene with DDB creature data is created (e.g. by the Plutonium map importer), place its monsters and NPCs automatically. Otherwise use the scene's context menu."
+			}
+		},
+		"Notify": {
+			"NoData": "This scene has no DDB creature data.",
+			"AlreadyPopulated": "This scene was already populated. Use the scene's context menu to place the creatures again.",
+			"Start": "Placing {count} DDB creatures on {scene}...",
+			"NoPlutonium": "Plutonium is not active: using official compendiums."
+		},
+		"Report": {
+			"Placed": "Placed {placed}/{total} DDB creatures on <strong>{scene}</strong>.",
+			"Missing": "Not found in any enabled source:"
+		}
+	}
+}
