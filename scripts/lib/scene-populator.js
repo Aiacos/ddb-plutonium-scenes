@@ -8,7 +8,9 @@ export class ScenePopulator {
 	static #running = new Set();
 
 	static getTokenData (scene) {
-		return scene?.getFlag(FLAG_SCOPE, "tokens") ?? [];
+		// Read directly: the data is written by Plutonium from the scene repository, and
+		// `getFlag` throws for a scope that is not an active package
+		return scene?.flags?.[FLAG_SCOPE]?.tokens ?? [];
 	}
 
 	static hasTokenData (scene) { return this.getTokenData(scene).length > 0; }
