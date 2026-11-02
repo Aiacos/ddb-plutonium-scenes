@@ -43,7 +43,11 @@ export class ImportQueue {
 		}
 
 		if (!game.settings.get(MODULE_ID, "autoPopulate")) return;
-		const toPopulate = scenes.filter(scene => ScenePopulator.hasTokenData(scene) && !ScenePopulator.isPopulated(scene));
+		const toPopulate = [];
+		for (const scene of scenes) {
+			if (ScenePopulator.isPopulated(scene) || !ScenePopulator.mayHaveTokenData(scene)) continue;
+			if ((await ScenePopulator.pGetTokenData(scene)).length) toPopulate.push(scene);
+		}
 		if (!toPopulate.length) return;
 		if (toPopulate.length > 1) {
 			ui.notifications.info(game.i18n.format("DDB_PLUT.Notify.Queue", {count: toPopulate.length}));

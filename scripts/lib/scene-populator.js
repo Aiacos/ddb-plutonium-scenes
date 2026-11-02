@@ -1,6 +1,7 @@
 import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, log} from "./constants.js";
 import {CompendiumSource} from "./compendium-source.js";
 import {PlutoniumSource} from "./plutonium-source.js";
+import {SideData} from "./side-data.js";
 
 const escapeHtml = str => String(str ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"})[c]);
 
@@ -17,6 +18,16 @@ export class ScenePopulator {
 	}
 
 	static hasTokenData (scene) { return this.getTokenData(scene).length > 0; }
+
+	/** Also covers scenes imported before the scene repository had creatures for them. */
+	static async pGetTokenData (scene) {
+		const own = this.getTokenData(scene);
+		if (own.length) return own;
+		return (await SideData.pGetModuleFlags(scene))?.tokens ?? [];
+	}
+
+	/** Whether the scene may have creatures to place, without fetching the scene repository. */
+	static mayHaveTokenData (scene) { return this.hasTokenData(scene) || SideData.isPlutoniumMap(scene); }
 
 	static isPopulated (scene) { return !!scene?.getFlag(MODULE_ID, "populated"); }
 
@@ -38,7 +49,7 @@ export class ScenePopulator {
 		const edition = game.settings.get(MODULE_ID, "edition");
 		const compendium = new CompendiumSource({edition});
 		const plutonium = PlutoniumSource.isAvailable() ? new PlutoniumSource({edition}) : null;
-		const fromCompendium = (token, opts) => compendium.getActor(token, opts);
+		const fromCompendium = (token, opts) => compendium.getActor(token, {...opts, isDynamicRing});
 		const fromPlutonium = token => plutonium.getActor(token, {isDynamicRing});
 
 		if (mode === MONSTER_SOURCE.PLUTONIUM && plutonium) return [fromPlutonium, ...(isFallback ? [fromCompendium] : [])];
@@ -76,7 +87,7 @@ export class ScenePopulator {
 	 */
 	static async pPopulate (scene, {force = false, sources = null} = {}) {
 		if (!game.user.isGM) return;
-		const tokens = this.getTokenData(scene);
+		const tokens = await this.pGetTokenData(scene);
 		if (!tokens.length) return void ui.notifications.info(game.i18n.localize("DDB_PLUT.Notify.NoData"));
 		if (this.#running.has(scene.id)) return;
 		if (this.isPopulated(scene) && !force) return void ui.notifications.info(game.i18n.localize("DDB_PLUT.Notify.AlreadyPopulated"));

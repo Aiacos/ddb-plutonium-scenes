@@ -69,7 +69,7 @@ const registerSettings = () => {
  */
 const addContextOption = (_app, options) => {
 	const getScene = li => game.scenes.get((li instanceof HTMLElement ? li : li[0])?.dataset.entryId);
-	const isVisible = li => game.user.isGM && ScenePopulator.hasTokenData(getScene(li));
+	const isVisible = li => game.user.isGM && ScenePopulator.mayHaveTokenData(getScene(li));
 	const run = li => ScenePopulator.pPopulate(getScene(li), {force: true});
 	options.push({
 		label: "DDB_PLUT.ContextMenu.Populate",
@@ -87,7 +87,7 @@ Hooks.once("init", () => {
 	// Debug / macro surface
 	globalThis.DDBPlutoniumScenes = {
 		populate: (scene = canvas.scene, opts) => ScenePopulator.pPopulate(scene, opts),
-		getTokenData: (scene = canvas.scene) => ScenePopulator.getTokenData(scene),
+		getTokenData: (scene = canvas.scene) => ScenePopulator.pGetTokenData(scene),
 		getCompendiums: () => CompendiumSource.getPacks(),
 		organize: (scene = canvas.scene) => SceneOrganizer.pOrganize(scene),
 		organizeAll: () => SceneOrganizer.pOrganizeAll(),

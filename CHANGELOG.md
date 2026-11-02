@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0] - 2026-11-02
+
+### Fixed
+- **Player versions get their creatures**: importing an adventure's player maps placed no creatures, because Plutonium gives scene data to a map by its own name only. The scene repository now carries the DM map's lights, walls and creatures for each player version too (rescaled when the player image has another resolution), and scenes imported before that get their creatures from the repository: re-run them with the scene context menu, or re-import to also get walls and lights.
+- Battlemap player versions ("Main Floor (Battlemap; Player Version)") are filed into their chapter folder.
+- Maps sharing a name with a battlemap (Curse of Strahd "Map 2: Walls of Ravenloft") and maps with a creature link in their title ("Baba Lysaga's Creeping Hut") were missing from the scene repository and stayed outside their chapter folder.
+
+### Changed
+- The **dynamic token ring** setting now also applies to creatures from official compendiums, not only to Plutonium imports.
+
 ## [0.2.0] - 2026-11-02
 
 ### Added

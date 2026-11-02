@@ -22,8 +22,8 @@
 				"Hint": "If a creature is not found in the chosen source, try the other one (Plutonium must be active)."
 			},
 			"DynamicRing": {
-				"Name": "Dynamic ring for Plutonium creatures",
-				"Hint": "Enable the token dynamic ring on creatures imported through Plutonium."
+				"Name": "Dynamic token ring",
+				"Hint": "Enable the token dynamic ring on the creatures this module imports, from official compendiums or through Plutonium."
 			},
 			"AutoPopulate": {
 				"Name": "Place creatures on scene import",

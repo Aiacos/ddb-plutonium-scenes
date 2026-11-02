@@ -85,7 +85,7 @@ export class CompendiumSource {
 	}
 
 	/** @return {Promise<?Actor>} */
-	async getActor (token, {folder}) {
+	async getActor (token, {folder, isDynamicRing = false}) {
 		const index = await this.#getIndex();
 		const bests = this.#getNames(token).map(name => this.#getBest(index.get(normName(name)))).filter(Boolean);
 		// A name with a statblock in the chosen edition beats an earlier name without one
@@ -93,11 +93,11 @@ export class CompendiumSource {
 		if (!hit) return null;
 
 		const uuid = hit.entry.uuid ?? `Compendium.${hit.pack.collection}.Actor.${hit.entry._id}`;
-		if (!this.#actors.has(uuid)) this.#actors.set(uuid, this.#pGetOrImport({uuid, hit, folder}));
+		if (!this.#actors.has(uuid)) this.#actors.set(uuid, this.#pGetOrImport({uuid, hit, folder, isDynamicRing}));
 		return this.#actors.get(uuid);
 	}
 
-	async #pGetOrImport ({uuid, hit, folder}) {
+	async #pGetOrImport ({uuid, hit, folder, isDynamicRing}) {
 		const existing = game.actors.find(a => a._stats?.compendiumSource === uuid || a.getFlag("core", "sourceId") === uuid);
 		if (existing) return existing;
 
@@ -105,6 +105,15 @@ export class CompendiumSource {
 		// Not `importFromCompendium`: it activates the Actors sidebar tab on every import
 		const data = game.actors.fromCompendium(doc);
 		data.folder = folder?.id ?? null;
+		if (isDynamicRing) CompendiumSource.#enableDynamicRing(data);
 		return Actor.implementation.create(data);
+	}
+
+	/** Ring the compendium token art, unless the entry already sets up its own ring. */
+	static #enableDynamicRing (data) {
+		const proto = data.prototypeToken ??= {};
+		if (proto.ring?.enabled) return;
+		proto.ring = {...proto.ring, enabled: true};
+		if (!proto.ring.subject?.texture && proto.texture?.src) proto.ring.subject = {...proto.ring.subject, texture: proto.texture.src};
 	}
 }
