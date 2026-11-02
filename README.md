@@ -33,11 +33,13 @@ Scenes are handled once Plutonium's import has finished (a few seconds after the
 | Monster & NPC source | Official compendiums | *Official compendiums* imports actors from the Wizards of the Coast compendiums installed in the world (or uses NPC Token Replacer's compendium selection when that module is active). *Plutonium* imports the 5etools creature. |
 | Rules edition | 2024 | *2024* uses the most recently published 2024 statblock (Monster Manual 2024, SRD 5.2, newer books), following 2024 renames (Goblin → Goblin Warrior). *2014* uses the original statblocks. A creature with no statblock in the chosen edition uses the other one. |
 | Fall back to the other source | on | Tries the other source for creatures the chosen one lacks (needs Plutonium). |
-| Dynamic ring for Plutonium creatures | on | Enables the token dynamic ring on Plutonium-imported creatures. |
+| Dynamic token ring | on | Enables the token dynamic ring on placed creatures (compendium and Plutonium). |
 | Place creatures on scene import | on | Places creatures as soon as Plutonium creates the scene. |
 | Chapter folders | on | Files imported scenes into Book › Chapter folders. |
 
-Each creature is imported once into the **DDB Scene Creatures** actor folder and reused.
+Creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder) are reused first. Anything else is imported once into the **DDB Scene Creatures** actor folder and reused.
+
+Named adventure NPCs that D&D Beyond places with a generic statblock (Danika Martikov as a Commoner) use the adventure's own creature and art (Danika Dorakova) when a source has it, and the generic statblock otherwise.
 
 ## 🐛 Console
 

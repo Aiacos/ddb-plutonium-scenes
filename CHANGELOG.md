@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.0] - 2026-11-02
+
+### Fixed
+- **Adventure NPCs get their own statblock and art**: DDB places many named NPCs with a generic statblock (Danika, Urwin, Brom and Bray Martikov as Commoners; Morgantha as a Night Hag). The scene repository now resolves them to the adventure's own 5etools creature (Danika Dorakova, Urwin Martikov, …), also when DDB names them differently (Rose and Thorn Durst → Rosavalda "Rose" Durst, Thornboldt "Thorn" Durst). Their generic statblock is only used when no source has the NPC.
+- **No duplicate actors**: creatures Plutonium already imported into the world (e.g. by an adventure import, in its "Creatures" folder) are reused before anything is imported, so each creature appears once in the Actors tab with Plutonium's art.
+
 ## [0.3.0] - 2026-11-02
 
 ### Fixed

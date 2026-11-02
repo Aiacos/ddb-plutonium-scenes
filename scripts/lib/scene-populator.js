@@ -2,6 +2,7 @@ import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, log} from "./constants.js";
 import {CompendiumSource} from "./compendium-source.js";
 import {PlutoniumSource} from "./plutonium-source.js";
 import {SideData} from "./side-data.js";
+import {WorldSource} from "./world-source.js";
 
 const escapeHtml = str => String(str ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"})[c]);
 
@@ -47,14 +48,19 @@ export class ScenePopulator {
 		const isFallback = game.settings.get(MODULE_ID, "fallback");
 		const isDynamicRing = game.settings.get(MODULE_ID, "dynamicRing");
 		const edition = game.settings.get(MODULE_ID, "edition");
+		const world = new WorldSource({edition});
 		const compendium = new CompendiumSource({edition});
 		const plutonium = PlutoniumSource.isAvailable() ? new PlutoniumSource({edition}) : null;
+		const fromWorld = token => world.getActor(token, {isDynamicRing});
 		const fromCompendium = (token, opts) => compendium.getActor(token, {...opts, isDynamicRing});
+		// Named NPCs first look for their own statblock everywhere, then settle for the generic one
+		const fromCompendiumStrict = (token, opts) => compendium.getActor(token, {...opts, isDynamicRing, isStrict: true});
 		const fromPlutonium = token => plutonium.getActor(token, {isDynamicRing});
 
-		if (mode === MONSTER_SOURCE.PLUTONIUM && plutonium) return [fromPlutonium, ...(isFallback ? [fromCompendium] : [])];
+		// Creatures Plutonium already imported (an adventure import) come first: same art, no duplicates
+		if (mode === MONSTER_SOURCE.PLUTONIUM && plutonium) return [fromWorld, fromPlutonium, ...(isFallback ? [fromCompendium] : [])];
 		if (mode === MONSTER_SOURCE.PLUTONIUM) ui.notifications.warn(game.i18n.localize("DDB_PLUT.Notify.NoPlutonium"));
-		return [fromCompendium, ...(plutonium && isFallback ? [fromPlutonium] : [])];
+		return [fromWorld, fromCompendiumStrict, ...(plutonium && isFallback ? [fromPlutonium] : []), fromCompendium];
 	}
 
 	static async #pGetActor (token, {sources, folder}) {

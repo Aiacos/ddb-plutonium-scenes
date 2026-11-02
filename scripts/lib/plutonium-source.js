@@ -57,7 +57,7 @@ export class PlutoniumSource {
 			if (!actor) return null;
 		}
 
-		if (isDynamicRing) await PlutoniumSource.#pEnsureDynamicRing(actor);
+		if (isDynamicRing) await PlutoniumSource.pEnsureDynamicRing(actor);
 		return actor;
 	}
 
@@ -65,7 +65,7 @@ export class PlutoniumSource {
 	 * Plutonium enables the ring itself when it has a "subject" image for the creature
 	 * (`importCreature.isEnableDynamicRing`). For the rest, ring the existing token art.
 	 */
-	static async #pEnsureDynamicRing (actor) {
+	static async pEnsureDynamicRing (actor) {
 		const proto = actor.prototypeToken;
 		if (proto.ring?.enabled) return;
 		await actor.update({

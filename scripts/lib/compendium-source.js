@@ -66,9 +66,11 @@ export class CompendiumSource {
 	 * Names to try for a token, most specific for the edition first. The 2024 name comes from the
 	 * scene data (2014 "Goblin" -> 2024 "Goblin Warrior"); the DDB name is the 2014 one.
 	 */
-	#getNames (token) {
+	#getNames (token, {isStrict}) {
 		const isModern = this.#edition === EDITION.MODERN;
 		const fromData = token.creatures?.[this.#edition]?.name ?? token.creature?.name;
+		// A named adventure NPC ("Danika Dorakova", placed by DDB as a Commoner): only its own statblock
+		if (isStrict && token.npc) return [fromData].filter(Boolean);
 		return [...new Set([
 			...(isModern ? [fromData] : []),
 			token.ddbName,
@@ -84,10 +86,14 @@ export class CompendiumSource {
 		return [...hits].sort((a, b) => score(b) - score(a))[0];
 	}
 
-	/** @return {Promise<?Actor>} */
-	async getActor (token, {folder, isDynamicRing = false}) {
+	/**
+	 * @param {{folder?: Folder, isDynamicRing?: boolean, isStrict?: boolean}} opts `isStrict` skips the
+	 * generic statblock of a named NPC, so another source can supply the NPC's own
+	 * @return {Promise<?Actor>}
+	 */
+	async getActor (token, {folder, isDynamicRing = false, isStrict = false}) {
 		const index = await this.#getIndex();
-		const bests = this.#getNames(token).map(name => this.#getBest(index.get(normName(name)))).filter(Boolean);
+		const bests = this.#getNames(token, {isStrict}).map(name => this.#getBest(index.get(normName(name)))).filter(Boolean);
 		// A name with a statblock in the chosen edition beats an earlier name without one
 		const hit = bests.find(it => it.edition === this.#edition) ?? bests[0];
 		if (!hit) return null;
