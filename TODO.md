@@ -3,7 +3,7 @@
 Open work for the module. The scene data side lives in [Aiacos/plutonium-scenes › TODO.md](https://github.com/Aiacos/plutonium-scenes/blob/main/TODO.md).
 
 ## ✅ Verification
-- [ ] Live-test v0.5.0 with a clean Curse of Strahd import: Martikov family and Rose/Thorn Durst with their CoS art, no duplicated actors, `mergeDuplicates()` on a world with pre-0.4.0 copies.
+- [x] Live test (2026-11-02, Foundry v14.369, clean Curse of Strahd import, 84 scenes): Martikov family and Rose/Thorn Durst with their CoS art; all scenes filed; nothing missing; 5 same-edition duplicates found → fixed in 0.5.1 and folded by `mergeDuplicates()` (614 tokens kept, none orphaned); forced re-populate keeps 21/21 tokens on Death House.
 
 ## 🐞 Known issues
 - [x] `populate(scene, {force: true})` stacked a second set of tokens — now replaces the ones this module placed (0.5.0).
