@@ -36,14 +36,20 @@ export class WorldSource {
 	}
 
 	/**
-	 * Only the statblock of the chosen rules edition is reused: a 2014 "Ghoul" Plutonium imported
-	 * is not the 2024 one the setting asks for, and the next sources import that instead.
+	 * Only a statblock of the chosen rules edition is reused: a 2014 "Ghoul" Plutonium imported is
+	 * not the 2024 one the setting asks for, and the next sources import that instead. The exact
+	 * 5etools statblock comes first; then the same creature from another book of the same edition
+	 * (the scene data may pick a later 2024 reprint of "Commoner" than the Monster Manual one an
+	 * adventure import brought in). A named NPC only ever matches its own statblock.
 	 * @return {Promise<?Actor>}
 	 */
 	async getActor (token, {isDynamicRing = false} = {}) {
 		const pick = this.#getPick(token);
 		if (!pick) return null;
-		const actor = WorldSource.#getPlutoniumActors().find(a => WorldSource.#isCreature(a, pick)) ?? null;
+		const actors = WorldSource.#getPlutoniumActors();
+		const actor = actors.find(a => WorldSource.#isCreature(a, pick))
+			?? (token.npc ? null : actors.find(a => normName(a.name) === normName(pick.name) && a.system?.source?.rules === this.#edition))
+			?? null;
 		if (actor && isDynamicRing) await PlutoniumSource.pEnsureDynamicRing(actor);
 		return actor;
 	}

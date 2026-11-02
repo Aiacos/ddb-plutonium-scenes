@@ -4,8 +4,8 @@ import {installFoundryMocks, plutActor} from "./helpers.js";
 import {WorldSource} from "../scripts/lib/world-source.js";
 
 const ghoulXmm = plutActor({id: "p1", name: "Ghoul", source: "XMM"});
-const ghoulMm = plutActor({id: "p2", name: "Ghoul", source: "MM"});
-const danika = plutActor({id: "p3", name: "Danika Dorakova", source: "CoS"});
+const ghoulMm = plutActor({id: "p2", name: "Ghoul", source: "MM", rules: "2014"});
+const danika = plutActor({id: "p3", name: "Danika Dorakova", source: "CoS", rules: "2014"});
 
 const ghoulToken = {name: "Ghoul", ddbName: "Ghoul", creatures: {"2024": {name: "Ghoul", source: "XMM"}, "2014": {name: "Ghoul", source: "MM"}}};
 const danikaToken = {name: "Danika Martikov", ddbName: "Commoner", npc: true, creatures: {"2024": {name: "Danika Dorakova", source: "CoS"}, "2014": {name: "Danika Dorakova", source: "CoS"}}};
@@ -35,4 +35,17 @@ test("ignores tokens without 5etools data and non-Plutonium actors", async () =>
 test("rings the reused actor when asked", async () => {
 	const actor = await new WorldSource({edition: "2024"}).getActor(danikaToken, {isDynamicRing: true});
 	assert.deepEqual(actor.updates, [{"prototypeToken.ring.enabled": true, "prototypeToken.ring.subject.texture": "Danika Dorakova.webp"}]);
+});
+
+test("reuses the same creature from another book of the chosen edition", async () => {
+	const commonerXmm = plutActor({id: "p4", name: "Commoner", source: "XMM"});
+	installFoundryMocks({actors: [commonerXmm]});
+	const token = {name: "Child", ddbName: "Commoner", creatures: {"2024": {name: "Commoner", source: "WttHC"}, "2014": {name: "Commoner", source: "MM"}}};
+	assert.equal(await new WorldSource({edition: "2024"}).getActor(token), commonerXmm);
+	assert.equal(await new WorldSource({edition: "2014"}).getActor(token), null);
+});
+
+test("a named NPC never settles for a same-name actor of another book", async () => {
+	installFoundryMocks({actors: [plutActor({id: "p5", name: "Danika Dorakova", source: "XYZ"})]});
+	assert.equal(await new WorldSource({edition: "2024"}).getActor(danikaToken), null);
 });

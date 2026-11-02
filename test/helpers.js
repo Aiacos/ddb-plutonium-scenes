@@ -14,9 +14,10 @@ export const installFoundryMocks = ({actors = [], packs = []} = {}) => {
 };
 
 /** A world actor Plutonium imported from 5etools. */
-export const plutActor = ({id, name, source, ring = false}) => ({
+export const plutActor = ({id, name, source, rules = "2024", ring = false}) => ({
 	id,
 	name,
+	system: {source: {rules}},
 	flags: {plutonium: {page: "bestiary.html", source, hash: `${encodeURIComponent(name.toLowerCase())}_${source.toLowerCase()}`}},
 	prototypeToken: {ring: {enabled: ring, subject: {}}, texture: {src: `${name}.webp`}},
 	updates: [],

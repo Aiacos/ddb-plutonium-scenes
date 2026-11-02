@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.5.1] - 2026-11-02
+
+### Fixed
+- A creature Plutonium imported is also reused when the scene data names a later reprint of the same statblock in the same rules edition (a 2024 "Commoner" from another book than the Monster Manual 2024), instead of importing a duplicate. Found in a clean Curse of Strahd import test: 5 duplicates left out of 199 actors.
+
 ## [0.5.0] - 2026-11-02
 
 ### Added
