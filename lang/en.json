@@ -11,6 +11,12 @@
 				"Compendium": "Official compendiums",
 				"Plutonium": "Plutonium (5etools) with dynamic ring"
 			},
+			"Edition": {
+				"Name": "Rules edition",
+				"Hint": "Which statblocks to use for monsters and NPCs. 2024 picks the most recently published 2024 statblock (Monster Manual 2024, SRD 5.2…), following renames such as Goblin → Goblin Warrior; 2014 uses the original ones. Creatures with no statblock in the chosen edition use the other.",
+				"Modern": "2024 (newest first)",
+				"Legacy": "2014"
+			},
 			"Fallback": {
 				"Name": "Fall back to the other source",
 				"Hint": "If a creature is not found in the chosen source, try the other one (Plutonium must be active)."
@@ -22,13 +28,19 @@
 			"AutoPopulate": {
 				"Name": "Place creatures on scene import",
 				"Hint": "When a scene with DDB creature data is created (e.g. by the Plutonium map importer), place its monsters and NPCs automatically. Otherwise use the scene's context menu."
+			},
+			"ChapterFolders": {
+				"Name": "Chapter folders",
+				"Hint": "Files imported scenes, player versions included, into Book › Chapter folders in reading order, like DDB Importer. Run DDBPlutoniumScenes.organizeAll() in the console to file scenes imported earlier."
 			}
 		},
 		"Notify": {
 			"NoData": "This scene has no DDB creature data.",
 			"AlreadyPopulated": "This scene was already populated. Use the scene's context menu to place the creatures again.",
 			"Start": "Placing {count} DDB creatures on {scene}...",
-			"NoPlutonium": "Plutonium is not active: using official compendiums."
+			"NoPlutonium": "Plutonium is not active: using official compendiums.",
+			"Queue": "Placing DDB creatures on {count} imported scenes, one at a time…",
+			"PlutoniumWarmup": "Plutonium is preparing its compendium cache for the first creature import of this session. This can take a minute or two; creatures will keep appearing on the scene."
 		},
 		"Report": {
 			"Placed": "Placed {placed}/{total} DDB creatures on <strong>{scene}</strong>.",

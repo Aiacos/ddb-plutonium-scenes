@@ -1,6 +1,8 @@
-import {MODULE_ID, MONSTER_SOURCE} from "./lib/constants.js";
+import {EDITION, MODULE_ID, MONSTER_SOURCE} from "./lib/constants.js";
 import {ScenePopulator} from "./lib/scene-populator.js";
 import {CompendiumSource} from "./lib/compendium-source.js";
+import {SceneOrganizer} from "./lib/scene-organizer.js";
+import {ImportQueue} from "./lib/import-queue.js";
 
 const registerSettings = () => {
 	game.settings.register(MODULE_ID, "monsterSource", {
@@ -14,6 +16,18 @@ const registerSettings = () => {
 			[MONSTER_SOURCE.PLUTONIUM]: "DDB_PLUT.Settings.MonsterSource.Plutonium",
 		},
 		default: MONSTER_SOURCE.COMPENDIUM,
+	});
+	game.settings.register(MODULE_ID, "edition", {
+		name: "DDB_PLUT.Settings.Edition.Name",
+		hint: "DDB_PLUT.Settings.Edition.Hint",
+		scope: "world",
+		config: true,
+		type: String,
+		choices: {
+			[EDITION.MODERN]: "DDB_PLUT.Settings.Edition.Modern",
+			[EDITION.LEGACY]: "DDB_PLUT.Settings.Edition.Legacy",
+		},
+		default: EDITION.MODERN,
 	});
 	game.settings.register(MODULE_ID, "fallback", {
 		name: "DDB_PLUT.Settings.Fallback.Name",
@@ -34,6 +48,14 @@ const registerSettings = () => {
 	game.settings.register(MODULE_ID, "autoPopulate", {
 		name: "DDB_PLUT.Settings.AutoPopulate.Name",
 		hint: "DDB_PLUT.Settings.AutoPopulate.Hint",
+		scope: "world",
+		config: true,
+		type: Boolean,
+		default: true,
+	});
+	game.settings.register(MODULE_ID, "chapterFolders", {
+		name: "DDB_PLUT.Settings.ChapterFolders.Name",
+		hint: "DDB_PLUT.Settings.ChapterFolders.Hint",
 		scope: "world",
 		config: true,
 		type: Boolean,
@@ -67,6 +89,8 @@ Hooks.once("init", () => {
 		populate: (scene = canvas.scene, opts) => ScenePopulator.pPopulate(scene, opts),
 		getTokenData: (scene = canvas.scene) => ScenePopulator.getTokenData(scene),
 		getCompendiums: () => CompendiumSource.getPacks(),
+		organize: (scene = canvas.scene) => SceneOrganizer.pOrganize(scene),
+		organizeAll: () => SceneOrganizer.pOrganizeAll(),
 	};
 });
 
@@ -74,6 +98,7 @@ Hooks.on("getSceneContextOptions", addContextOption);
 
 Hooks.on("createScene", (scene, _options, userId) => {
 	if (userId !== game.user.id || !game.user.isGM) return;
-	if (!game.settings.get(MODULE_ID, "autoPopulate") || !ScenePopulator.hasTokenData(scene)) return;
-	ScenePopulator.pPopulate(scene).catch(e => console.error(`${MODULE_ID} | Auto-populate failed`, e));
+	// Only scenes imported by Plutonium: chapter data comes from its scene repository
+	if (!scene.flags?.plutonium) return;
+	ImportQueue.add(scene);
 });

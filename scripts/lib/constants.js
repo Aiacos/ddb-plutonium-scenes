@@ -13,6 +13,29 @@ export const MONSTER_SOURCE = Object.freeze({
  * creature name exists in several (adventure > rulebook > SRD). Mirrors npc-token-replacer's
  * SourceDetector whitelist; that module's selection is used instead whenever it is active.
  */
+export const EDITION = Object.freeze({
+	MODERN: "2024",
+	LEGACY: "2014",
+});
+
+/**
+ * Official packages whose statblocks follow the 2024 rules, for compendium entries that do not
+ * carry `system.source.rules` themselves. In the dnd5e system, `actors24` is the SRD 5.2 pack and
+ * `monsters` the SRD 5.1 (2014) one.
+ */
+export const MODERN_PACKAGES = new Set([
+	"dnd-monster-manual",
+	"dnd-players-handbook",
+	"dnd-dungeon-masters-guide",
+	"dnd-forge-artificer",
+	"dnd-arcana-unleashed",
+	"dnd-adventures-faerun",
+	"dnd-heroes-faerun",
+	"dnd-heroes-borderlands",
+	"dnd-ravenloft-horrors-within",
+	"dnd-deadfall",
+]);
+
 export const OFFICIAL_PACKAGE_PRIORITY = Object.freeze({
 	"dnd5e": 1,
 	"dnd-tashas-cauldron": 1,

@@ -22,14 +22,20 @@ Import a map with Plutonium's map importer as usual. The scene arrives with its 
 
 A GM-only chat message lists how many creatures were placed and which were not found.
 
+Scenes, player versions included, are also filed into **Book › Chapter** folders in reading order, as DDB Importer does (setting **Chapter folders**). To file scenes imported before, run `DDBPlutoniumScenes.organizeAll()` in the console.
+
+Scenes are handled once Plutonium's import has finished (a few seconds after the last scene appears), one scene at a time with a progress bar. The first time a session needs a creature from Plutonium, Plutonium caches every compendium first, which can take a minute or two.
+
 ## ⚙️ Settings
 
 | Setting | Default | |
 |---------|---------|--|
 | Monster & NPC source | Official compendiums | *Official compendiums* imports actors from the Wizards of the Coast compendiums installed in the world (or uses NPC Token Replacer's compendium selection when that module is active). *Plutonium* imports the 5etools creature. |
+| Rules edition | 2024 | *2024* uses the most recently published 2024 statblock (Monster Manual 2024, SRD 5.2, newer books), following 2024 renames (Goblin → Goblin Warrior). *2014* uses the original statblocks. A creature with no statblock in the chosen edition uses the other one. |
 | Fall back to the other source | on | Tries the other source for creatures the chosen one lacks (needs Plutonium). |
 | Dynamic ring for Plutonium creatures | on | Enables the token dynamic ring on Plutonium-imported creatures. |
 | Place creatures on scene import | on | Places creatures as soon as Plutonium creates the scene. |
+| Chapter folders | on | Files imported scenes into Book › Chapter folders. |
 
 Each creature is imported once into the **DDB Scene Creatures** actor folder and reused.
 
@@ -40,6 +46,8 @@ DDBPlutoniumScenes.populate();              // the scene on the canvas
 DDBPlutoniumScenes.populate(scene, {force: true});
 DDBPlutoniumScenes.getTokenData();          // creature placements stored on the scene
 DDBPlutoniumScenes.getCompendiums();        // compendiums searched in compendium mode
+DDBPlutoniumScenes.organize(scene);         // file one scene into its chapter folder
+DDBPlutoniumScenes.organizeAll();           // file every scene that has chapter data
 ```
 
 ## 📜 Licence and credits
