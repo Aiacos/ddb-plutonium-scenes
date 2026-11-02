@@ -1,4 +1,4 @@
-import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, log, normName} from "./constants.js";
+import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, getLoadedVersion, log, normName} from "./constants.js";
 import {CompendiumSource} from "./compendium-source.js";
 import {PlutoniumSource} from "./plutonium-source.js";
 import {SideData} from "./side-data.js";
@@ -141,9 +141,11 @@ export class ScenePopulator {
 				if (pending.length && isSceneAlive()) {
 					const created = await scene.createEmbeddedDocuments("Token", pending.map(it => it.data));
 					placed += created.length;
-					// Put back personal names other modules replaced on creation
+					// Put back personal names other modules replaced on creation. Matched by the index
+					// stored on the token: other modules may skip or reorder creations.
+					const wantedByIx = new Map(pending.map(it => [it.ix, it]));
 					const renames = created
-						.map((doc, i) => ({doc, wanted: pending[i]}))
+						.map(doc => ({doc, wanted: wantedByIx.get(doc.flags?.[MODULE_ID]?.ix)}))
 						.filter(({doc, wanted}) => wanted?.isPersonal && doc.name !== wanted.data.name)
 						.map(({doc, wanted}) => ({_id: doc.id, name: wanted.data.name}));
 					if (renames.length) await scene.updateEmbeddedDocuments("Token", renames);
@@ -169,9 +171,9 @@ export class ScenePopulator {
 					elevation: token.elevation ?? 0,
 					disposition: token.disposition,
 					hidden: token.hidden ?? false,
-					flags: {[MODULE_ID]: {ddbName: token.ddbName}},
+					flags: {[MODULE_ID]: {ddbName: token.ddbName, ix}},
 				}, {parent: scene});
-				pending.push({data: doc.toObject(), isPersonal: isPersonalName(token)});
+				pending.push({ix, data: doc.toObject(), isPersonal: isPersonalName(token)});
 				if (pending.length >= BATCH_SIZE) await pFlush();
 			}
 			await pFlush();
@@ -200,7 +202,7 @@ export class ScenePopulator {
 			.map(([source, n]) => `${game.i18n.localize(`DDB_PLUT.Report.Source.${source}`)} ${n}`)
 			.join(", ");
 		const errorList = [...errors].slice(0, 5).map(e => `<li>${escapeHtml(e)}</li>`).join("");
-		const version = game.modules.get(MODULE_ID)?.version ?? "?";
+		const version = getLoadedVersion();
 		const content = `<p>${game.i18n.format("DDB_PLUT.Report.Placed", {placed, total, scene: escapeHtml(scene.name)})}</p>`
 			+ (sources ? `<p>${game.i18n.localize("DDB_PLUT.Report.From")} ${sources}.</p>` : "")
 			+ (missingList ? `<p>${game.i18n.localize("DDB_PLUT.Report.Missing")}</p><ul>${missingList}</ul>` : "")

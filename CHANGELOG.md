@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.5.3] - 2026-11-02
+
+### Fixed
+- Restoring personal names after a token-naming module could put a name on the wrong token (a Dretch named "Morgantha" in Old Bonegrinder): new tokens can come back in another order, so they are now matched through an index stored on each token.
+- The chat report and the startup log show the version the client really runs, read from the module's `module.json`: after an in-place update Foundry keeps reporting the old version until the server restarts.
+
 ## [0.5.2] - 2026-11-02
 
 ### Fixed

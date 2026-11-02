@@ -58,3 +58,21 @@ export const warn = (...args) => console.warn(`${MODULE_ID} |`, ...args);
 
 /** "Goblin Boss", "goblin-boss", "Goblin  boss" -> "goblinboss" */
 export const normName = str => (str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+let loadedVersion = null;
+
+/**
+ * The version of the code this client runs. Foundry reads module manifests only when the server
+ * starts, so after an in-place update `game.modules` still reports the old version.
+ */
+export const pLoadVersion = async () => {
+	try {
+		const response = await fetch(`modules/${MODULE_ID}/module.json`, {cache: "no-store"});
+		loadedVersion = (await response.json()).version;
+	} catch {
+		loadedVersion = game.modules.get(MODULE_ID)?.version ?? null;
+	}
+	return loadedVersion;
+};
+
+export const getLoadedVersion = () => loadedVersion ?? game.modules.get(MODULE_ID)?.version ?? "?";
