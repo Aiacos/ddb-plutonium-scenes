@@ -1,13 +1,15 @@
 import {MODULE_ID, log, normName} from "./constants.js";
 
 /**
- * Pairs each actor this module imported with the world actor Plutonium imported for the same
- * creature: the same 5etools statblock (`hash`) when ours came from Plutonium, otherwise the same
- * name. Names Plutonium imported more than once are ambiguous and left alone.
- * @param {{ours: Array<{id, name, hash?}>, plutonium: Array<{id, name, hash}>}} actors
+ * Pairs each actor this module imported through Plutonium with the world actor Plutonium imported
+ * for the same creature: the same 5etools statblock (`hash`), otherwise the same name. Names
+ * Plutonium imported more than once are ambiguous and left alone. Copies from official compendiums
+ * are kept: their statblocks are preferred over Plutonium's.
+ * @param {{ours: Array<{id, name, hash?, isOfficial?}>, plutonium: Array<{id, name, hash}>}} actors
  * @return {Array<{fromId: string, toId: string}>}
  */
 export const planMerges = ({ours, plutonium}) => ours.flatMap(actor => {
+	if (actor.isOfficial) return [];
 	const others = plutonium.filter(it => it.id !== actor.id);
 	const byHash = actor.hash ? others.filter(it => it.hash === actor.hash) : [];
 	const matches = byHash.length ? byHash : others.filter(it => normName(it.name) === normName(actor.name));
@@ -15,15 +17,20 @@ export const planMerges = ({ours, plutonium}) => ours.flatMap(actor => {
 });
 
 /**
- * Versions before 0.4.0 imported their own copy of creatures an adventure import had already
- * brought in through Plutonium. Moves the tokens of those copies onto Plutonium's actors and
+ * Earlier versions imported their own copy of creatures an adventure import had already brought in
+ * through Plutonium. Moves the tokens of those copies onto Plutonium's actors and
  * deletes the copies.
  */
 export class ActorMerger {
 	/** @param {Folder} folder this module's actor folder */
 	static async pMergeDuplicates (folder) {
 		if (!game.user.isGM) return {actors: 0, tokens: 0};
-		const toPlain = a => ({id: a.id, name: a.name, hash: a.flags?.plutonium?.hash ?? null});
+		const toPlain = a => ({
+			id: a.id,
+			name: a.name,
+			hash: a.flags?.plutonium?.hash ?? null,
+			isOfficial: String(a._stats?.compendiumSource ?? a.flags?.core?.sourceId ?? "").startsWith("Compendium."),
+		});
 		const ours = folder ? game.actors.filter(a => a.folder?.id === folder.id) : [];
 		const plutonium = game.actors.filter(a => a.flags?.plutonium?.page === "bestiary.html" && a.folder?.id !== folder?.id);
 		const merges = planMerges({ours: ours.map(toPlain), plutonium: plutonium.map(toPlain)});

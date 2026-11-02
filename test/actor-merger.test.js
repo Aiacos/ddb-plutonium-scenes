@@ -2,7 +2,7 @@ import {test} from "node:test";
 import assert from "node:assert/strict";
 import {planMerges} from "../scripts/lib/actor-merger.js";
 
-test("merges a compendium copy into Plutonium's actor of the same name", () => {
+test("merges an unofficial copy into Plutonium's actor of the same name", () => {
 	const merges = planMerges({
 		ours: [{id: "a1", name: "Ghoul", hash: null}],
 		plutonium: [{id: "p1", name: "Ghoul", hash: "ghoul_xmm"}, {id: "p2", name: "Ghast", hash: "ghast_xmm"}],
@@ -22,6 +22,14 @@ test("ambiguous or unknown names are left alone", () => {
 	const merges = planMerges({
 		ours: [{id: "a1", name: "Commoner", hash: null}, {id: "a2", name: "Mimic", hash: null}],
 		plutonium: [{id: "p1", name: "Commoner", hash: "commoner_xmm"}, {id: "p2", name: "Commoner", hash: "commoner_mm"}],
+	});
+	assert.deepEqual(merges, []);
+});
+
+test("official compendium copies are kept: they win over Plutonium's statblocks", () => {
+	const merges = planMerges({
+		ours: [{id: "a1", name: "Night Hag", hash: null, isOfficial: true}],
+		plutonium: [{id: "p1", name: "Night Hag", hash: "night hag_xmm"}],
 	});
 	assert.deepEqual(merges, []);
 });

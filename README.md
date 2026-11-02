@@ -37,7 +37,13 @@ Scenes are handled once Plutonium's import has finished (a few seconds after the
 | Place creatures on scene import | on | Places creatures as soon as Plutonium creates the scene. |
 | Chapter folders | on | Files imported scenes into Book › Chapter folders. |
 
-Creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder) are reused first, when they are the statblock of the chosen rules edition. Anything else is imported once into the **DDB Scene Creatures** actor folder and reused.
+In compendium mode, each creature comes from the first source that has it:
+
+1. the **official compendiums**, in the chosen rules edition (the Monster Manual 2024 "Night Hag");
+2. creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder), when they are the statblock of the chosen edition: adventure NPCs such as Danika Dorakova;
+3. the NPC's own statblock in the other edition, then Plutonium's importer (with the fallback setting), then the generic statblock of any edition.
+
+Anything imported is put once into the **DDB Scene Creatures** actor folder and reused. In Plutonium mode, Plutonium's actors come first.
 
 Named adventure NPCs that D&D Beyond places with a generic statblock (Danika Martikov as a Commoner) use the adventure's own creature and art (Danika Dorakova) when a source has it, and the generic statblock otherwise.
 
@@ -50,7 +56,7 @@ DDBPlutoniumScenes.getTokenData();          // creature placements stored on the
 DDBPlutoniumScenes.getCompendiums();        // compendiums searched in compendium mode
 DDBPlutoniumScenes.organize(scene);         // file one scene into its chapter folder
 DDBPlutoniumScenes.organizeAll();           // file every scene that has chapter data
-DDBPlutoniumScenes.mergeDuplicates();       // fold copies made before v0.4.0 into Plutonium's actors
+DDBPlutoniumScenes.mergeDuplicates();       // fold copies Plutonium imported twice (official ones are kept)
 ```
 
 ## 🛠️ Development

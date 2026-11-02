@@ -7,7 +7,7 @@
 		"Settings": {
 			"MonsterSource": {
 				"Name": "Fonte di mostri e PNG",
-				"Hint": "Da dove arrivano le creature posizionate sulle scene importate. Compendi ufficiali usa i compendi Wizards of the Coast installati nel mondo (la selezione di NPC Token Replacer, se attivo). Plutonium importa la creatura da 5etools e la tokenizza con il dynamic ring.",
+				"Hint": "Da dove arrivano le creature posizionate sulle scene importate. Compendi ufficiali usa prima i compendi Wizards of the Coast installati nel mondo (la selezione di NPC Token Replacer, se attivo), poi le creature che Plutonium ha già importato con l'avventura. Plutonium usa prima le creature di Plutonium e le importa da 5etools con il dynamic ring.",
 				"Compendium": "Compendi ufficiali",
 				"Plutonium": "Plutonium (5etools) con dynamic ring"
 			},

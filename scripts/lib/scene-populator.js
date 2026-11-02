@@ -74,14 +74,18 @@ export class ScenePopulator {
 		const plutonium = PlutoniumSource.isAvailable() ? new PlutoniumSource({edition}) : null;
 		const fromWorld = labelled("World", token => world.getActor(token, {isDynamicRing}));
 		const fromCompendium = labelled("Compendium", (token, opts) => compendium.getActor(token, {...opts, isDynamicRing}));
+		// The official book's statblock in the chosen edition (Monster Manual 2025 "Night Hag")
+		const fromOfficial = labelled("Compendium", (token, opts) => compendium.getActor(token, {...opts, isDynamicRing, isStrict: true, isEditionOnly: true}));
 		// Named NPCs first look for their own statblock everywhere, then settle for the generic one
 		const fromCompendiumStrict = labelled("Compendium", (token, opts) => compendium.getActor(token, {...opts, isDynamicRing, isStrict: true}));
 		const fromPlutonium = labelled("Plutonium", token => plutonium.getActor(token, {isDynamicRing}));
 
-		// Creatures Plutonium already imported (an adventure import) come first: same art, no duplicates
+		// Plutonium mode: creatures Plutonium already imported (an adventure import) come first
 		if (mode === MONSTER_SOURCE.PLUTONIUM && plutonium) return [fromWorld, fromPlutonium, ...(isFallback ? [fromCompendium] : [])];
 		if (mode === MONSTER_SOURCE.PLUTONIUM) ui.notifications.warn(game.i18n.localize("DDB_PLUT.Notify.NoPlutonium"));
-		return [fromWorld, fromCompendiumStrict, ...(plutonium && isFallback ? [fromPlutonium] : []), fromCompendium];
+		// Official compendiums first: their statblocks and art win over Plutonium's downloaded ones.
+		// Adventure NPCs missing from them (Danika Dorakova) still come from Plutonium's actors.
+		return [fromOfficial, fromWorld, fromCompendiumStrict, ...(plutonium && isFallback ? [fromPlutonium] : []), fromCompendium];
 	}
 
 	/** @return {Promise<{actor: ?Actor, source: ?string, errors: string[]}>} */

@@ -87,13 +87,15 @@ export class CompendiumSource {
 	}
 
 	/**
-	 * @param {{folder?: Folder, isDynamicRing?: boolean, isStrict?: boolean}} opts `isStrict` skips the
-	 * generic statblock of a named NPC, so another source can supply the NPC's own
+	 * @param {{folder?: Folder, isDynamicRing?: boolean, isStrict?: boolean, isEditionOnly?: boolean}} opts
+	 * `isStrict` skips the generic statblock of a named NPC, so another source can supply the NPC's
+	 * own; `isEditionOnly` only accepts statblocks of the chosen rules edition
 	 * @return {Promise<?Actor>}
 	 */
-	async getActor (token, {folder, isDynamicRing = false, isStrict = false}) {
+	async getActor (token, {folder, isDynamicRing = false, isStrict = false, isEditionOnly = false}) {
 		const index = await this.#getIndex();
-		const bests = this.#getNames(token, {isStrict}).map(name => this.#getBest(index.get(normName(name)))).filter(Boolean);
+		const getHits = name => (index.get(normName(name)) ?? []).filter(it => !isEditionOnly || it.edition === this.#edition);
+		const bests = this.#getNames(token, {isStrict}).map(name => this.#getBest(getHits(name))).filter(Boolean);
 		// A name with a statblock in the chosen edition beats an earlier name without one
 		const hit = bests.find(it => it.edition === this.#edition) ?? bests[0];
 		if (!hit) return null;

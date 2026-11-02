@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.0] - 2026-11-02
+
+### Changed
+- **Official statblocks first**: in compendium mode a creature now comes from the official compendiums installed in the world (Monster Manual 2024 and the other Wizards of the Coast books) when they have it in the chosen rules edition, before the copy Plutonium downloaded with the adventure. Adventure NPCs the official books lack (Danika Dorakova, Morgantha) still use Plutonium's actors. Plutonium mode is unchanged.
+- `mergeDuplicates()` keeps copies from official compendiums instead of folding them into Plutonium's actors.
+
+To switch creatures already placed, right-click a scene → **Place DDB monsters & NPCs** (it replaces what the module placed).
+
 ## [0.5.3] - 2026-11-02
 
 ### Fixed

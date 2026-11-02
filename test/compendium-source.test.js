@@ -39,3 +39,14 @@ test("rings the imported token art when asked", async () => {
 	const actor = await new CompendiumSource({edition: "2024"}).getActor(goblinToken, {isDynamicRing: true});
 	assert.deepEqual(actor.prototypeToken.ring, {enabled: true, subject: {texture: "Goblin Warrior.webp"}});
 });
+
+test("edition-only lookups skip statblocks of the other edition", async () => {
+	const legacyOnly = {name: "Goblin", ddbName: "Goblin", creatures: {"2014": {name: "Goblin", source: "MM"}}};
+	assert.equal(await new CompendiumSource({edition: "2024"}).getActor(legacyOnly, {isEditionOnly: true}), null);
+	assert.equal((await new CompendiumSource({edition: "2024"}).getActor(legacyOnly, {})).name, "Goblin");
+});
+
+test("a personal name on a generic statblock takes the official book's statblock", async () => {
+	const bildrath = {name: "Bildrath", ddbName: "Commoner", creatures: {"2024": {name: "Commoner", source: "WttHC"}}};
+	assert.equal((await new CompendiumSource({edition: "2024"}).getActor(bildrath, {isStrict: true, isEditionOnly: true})).name, "Commoner");
+});
