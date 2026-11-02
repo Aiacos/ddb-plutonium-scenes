@@ -46,7 +46,14 @@
 		},
 		"Report": {
 			"Placed": "Placed {placed}/{total} DDB creatures on <strong>{scene}</strong>.",
-			"Missing": "Not found in any enabled source:"
+			"Missing": "Not found in any enabled source:",
+			"From": "Creatures from:",
+			"Errors": "Errors (see the console for details):",
+			"Source": {
+				"World": "Plutonium actors already in the world",
+				"Compendium": "official compendiums",
+				"Plutonium": "Plutonium imports"
+			}
 		}
 	}
 }

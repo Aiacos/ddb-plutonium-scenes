@@ -1,4 +1,4 @@
-import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, log} from "./constants.js";
+import {FLAG_SCOPE, MODULE_ID, MONSTER_SOURCE, log, normName} from "./constants.js";
 import {CompendiumSource} from "./compendium-source.js";
 import {PlutoniumSource} from "./plutonium-source.js";
 import {SideData} from "./side-data.js";
@@ -8,6 +8,23 @@ const escapeHtml = str => String(str ?? "").replace(/[&<>"']/g, c => ({"&": "&am
 
 /** Tokens are created in batches, so a long import shows up on the scene as it goes. */
 const BATCH_SIZE = 10;
+
+/**
+ * Whether DDB gave the token a personal name ("Bella Sunbane" on a Night Hag), rather than its
+ * statblock's name with a counter ("Goblin 3"). Token-naming modules such as Token Mold rename new
+ * tokens; personal names are restored after them.
+ */
+export const isPersonalName = token => {
+	// The book's own named NPC ("Morgantha") keeps its name too
+	if (token.npc) return true;
+	const base = normName(String(token.name ?? "").replace(/\s*(\(.*?\)|#?\d+)$/, ""));
+	if (!base) return false;
+	const generic = [token.ddbName, token.creatures?.["2024"]?.name, token.creatures?.["2014"]?.name, token.creature?.name];
+	return !generic.filter(Boolean).map(normName).includes(base);
+};
+
+/** Labels a source for the chat report: where each placed creature came from. */
+const labelled = (source, fn) => Object.assign(fn, {source});
 
 export class ScenePopulator {
 	static #running = new Set();
@@ -55,11 +72,11 @@ export class ScenePopulator {
 		const world = new WorldSource({edition});
 		const compendium = new CompendiumSource({edition});
 		const plutonium = PlutoniumSource.isAvailable() ? new PlutoniumSource({edition}) : null;
-		const fromWorld = token => world.getActor(token, {isDynamicRing});
-		const fromCompendium = (token, opts) => compendium.getActor(token, {...opts, isDynamicRing});
+		const fromWorld = labelled("World", token => world.getActor(token, {isDynamicRing}));
+		const fromCompendium = labelled("Compendium", (token, opts) => compendium.getActor(token, {...opts, isDynamicRing}));
 		// Named NPCs first look for their own statblock everywhere, then settle for the generic one
-		const fromCompendiumStrict = (token, opts) => compendium.getActor(token, {...opts, isDynamicRing, isStrict: true});
-		const fromPlutonium = token => plutonium.getActor(token, {isDynamicRing});
+		const fromCompendiumStrict = labelled("Compendium", (token, opts) => compendium.getActor(token, {...opts, isDynamicRing, isStrict: true}));
+		const fromPlutonium = labelled("Plutonium", token => plutonium.getActor(token, {isDynamicRing}));
 
 		// Creatures Plutonium already imported (an adventure import) come first: same art, no duplicates
 		if (mode === MONSTER_SOURCE.PLUTONIUM && plutonium) return [fromWorld, fromPlutonium, ...(isFallback ? [fromCompendium] : [])];
@@ -67,16 +84,19 @@ export class ScenePopulator {
 		return [fromWorld, fromCompendiumStrict, ...(plutonium && isFallback ? [fromPlutonium] : []), fromCompendium];
 	}
 
+	/** @return {Promise<{actor: ?Actor, source: ?string, errors: string[]}>} */
 	static async #pGetActor (token, {sources, folder}) {
+		const errors = [];
 		for (const getActor of sources) {
 			try {
 				const actor = await getActor(token, {folder});
-				if (actor) return actor;
+				if (actor) return {actor, source: getActor.source ?? null, errors};
 			} catch (e) {
 				console.error(`${MODULE_ID} | Failed to get an actor for "${token.name}"`, e);
+				errors.push(`${getActor.source ?? "?"}: ${e.message}`);
 			}
 		}
-		return null;
+		return {actor: null, source: null, errors};
 	}
 
 	/** A progress-bar notification (Foundry v13+), or a plain one on older cores. */
@@ -114,11 +134,19 @@ export class ScenePopulator {
 			let placed = 0;
 			let pending = [];
 			const missing = new Map();
+			const bySource = new Map();
+			const errors = new Set();
 			const isSceneAlive = () => game.scenes.has(scene.id);
 			const pFlush = async () => {
 				if (pending.length && isSceneAlive()) {
-					await scene.createEmbeddedDocuments("Token", pending);
-					placed += pending.length;
+					const created = await scene.createEmbeddedDocuments("Token", pending.map(it => it.data));
+					placed += created.length;
+					// Put back personal names other modules replaced on creation
+					const renames = created
+						.map((doc, i) => ({doc, wanted: pending[i]}))
+						.filter(({doc, wanted}) => wanted?.isPersonal && doc.name !== wanted.data.name)
+						.map(({doc, wanted}) => ({_id: doc.id, name: wanted.data.name}));
+					if (renames.length) await scene.updateEmbeddedDocuments("Token", renames);
 				}
 				pending = [];
 			};
@@ -126,12 +154,14 @@ export class ScenePopulator {
 			for (const [ix, token] of tokens.entries()) {
 				// The scene may be deleted while creatures are still being imported
 				if (!isSceneAlive()) return;
-				const actor = await this.#pGetActor(token, {sources, folder});
+				const {actor, source, errors: errs} = await this.#pGetActor(token, {sources, folder});
+				errs.forEach(it => errors.add(it));
 				progress.update((ix + 1) / tokens.length, `${label} ${ix + 1}/${tokens.length}`);
 				if (!actor) {
 					missing.set(token.ddbName, (missing.get(token.ddbName) ?? 0) + 1);
 					continue;
 				}
+				bySource.set(source, (bySource.get(source) ?? 0) + 1);
 				const doc = await actor.getTokenDocument({
 					name: token.name,
 					x: token.x,
@@ -141,7 +171,7 @@ export class ScenePopulator {
 					hidden: token.hidden ?? false,
 					flags: {[MODULE_ID]: {ddbName: token.ddbName}},
 				}, {parent: scene});
-				pending.push(doc.toObject());
+				pending.push({data: doc.toObject(), isPersonal: isPersonalName(token)});
 				if (pending.length >= BATCH_SIZE) await pFlush();
 			}
 			await pFlush();
@@ -149,7 +179,7 @@ export class ScenePopulator {
 
 			await scene.setFlag(MODULE_ID, "populated", true);
 			log(`Placed ${placed}/${tokens.length} tokens on "${scene.name}"`);
-			await this.#pReport({scene, placed, total: tokens.length, missing});
+			await this.#pReport({scene, placed, total: tokens.length, missing, bySource, errors});
 		} finally {
 			progress.done();
 			this.#running.delete(scene.id);
@@ -162,12 +192,20 @@ export class ScenePopulator {
 		if (ids.length) await scene.deleteEmbeddedDocuments("Token", ids);
 	}
 
-	static async #pReport ({scene, placed, total, missing}) {
+	static async #pReport ({scene, placed, total, missing, bySource, errors}) {
 		const missingList = [...missing.entries()]
 			.map(([name, n]) => `<li>${escapeHtml(name)}${n > 1 ? ` &times;${n}` : ""}</li>`)
 			.join("");
+		const sources = [...bySource.entries()]
+			.map(([source, n]) => `${game.i18n.localize(`DDB_PLUT.Report.Source.${source}`)} ${n}`)
+			.join(", ");
+		const errorList = [...errors].slice(0, 5).map(e => `<li>${escapeHtml(e)}</li>`).join("");
+		const version = game.modules.get(MODULE_ID)?.version ?? "?";
 		const content = `<p>${game.i18n.format("DDB_PLUT.Report.Placed", {placed, total, scene: escapeHtml(scene.name)})}</p>`
-			+ (missingList ? `<p>${game.i18n.localize("DDB_PLUT.Report.Missing")}</p><ul>${missingList}</ul>` : "");
+			+ (sources ? `<p>${game.i18n.localize("DDB_PLUT.Report.From")} ${sources}.</p>` : "")
+			+ (missingList ? `<p>${game.i18n.localize("DDB_PLUT.Report.Missing")}</p><ul>${missingList}</ul>` : "")
+			+ (errorList ? `<p>${game.i18n.localize("DDB_PLUT.Report.Errors")}</p><ul>${errorList}</ul>` : "")
+			+ `<p><small>v${escapeHtml(version)}</small></p>`;
 		await ChatMessage.implementation.create({content, whisper: ChatMessage.getWhisperRecipients("GM").map(u => u.id), speaker: {alias: "DDB Scenes"}});
 	}
 }

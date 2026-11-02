@@ -1,4 +1,4 @@
-import {EDITION, MODULE_ID, MONSTER_SOURCE} from "./lib/constants.js";
+import {EDITION, MODULE_ID, MONSTER_SOURCE, log} from "./lib/constants.js";
 import {ScenePopulator} from "./lib/scene-populator.js";
 import {CompendiumSource} from "./lib/compendium-source.js";
 import {SceneOrganizer} from "./lib/scene-organizer.js";
@@ -84,6 +84,8 @@ const addContextOption = (_app, options) => {
 };
 
 Hooks.once("init", () => {
+	// The version in the console tells which code a client really runs
+	log(`v${game.modules.get(MODULE_ID)?.version} loaded`);
 	registerSettings();
 	// Debug / macro surface
 	globalThis.DDBPlutoniumScenes = {

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.5.2] - 2026-11-02
+
+### Fixed
+- **Named NPCs keep their names** when a token-naming module (Token Mold) renames new tokens: Bella Sunbane and Offalia Wormwiggle, Morgantha's daughters in Old Bonegrinder, had become "Capable Night Hag (1)" and "Steadfast Night Hag (2)". Generic creatures ("Ghoul 3") are still left to the naming module.
+
+### Added
+- The chat report says where the creatures came from (Plutonium actors already in the world, official compendiums, Plutonium imports), lists source errors instead of only logging them, and shows the module version; the console logs the version at startup. This makes a failing import diagnosable from the report alone.
+
+### Scene data
+- Curse of Strahd: Wizard of Wines Winery, Abbey of Saint Markovia ground floor, Tsolenka Pass, Baba Lysaga's Creeping Hut, Ruins of Berez and the Elevator Trap now have DDB creatures, lights and walls (see the plutonium-scenes CHANGELOG).
+
 ## [0.5.1] - 2026-11-02
 
 ### Fixed
