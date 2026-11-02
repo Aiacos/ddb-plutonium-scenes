@@ -50,3 +50,22 @@ test("a personal name on a generic statblock takes the official book's statblock
 	const bildrath = {name: "Bildrath", ddbName: "Commoner", creatures: {"2024": {name: "Commoner", source: "WttHC"}}};
 	assert.equal((await new CompendiumSource({edition: "2024"}).getActor(bildrath, {isStrict: true, isEditionOnly: true})).name, "Commoner");
 });
+
+test("the Monster Manual wins over reprints in other official books", async () => {
+	installFoundryMocks({packs: [
+		pack({packageName: "dnd-dungeon-masters-guide", entries: [{name: "Wolf", rules: "2024"}]}),
+		pack({packageName: "dnd-ravenloft-horrors-within", entries: [{name: "Guard", rules: "2024"}, {name: "Madam Eva", rules: "2024"}]}),
+		pack({packageName: "dnd-monster-manual", entries: [{name: "Wolf", rules: "2024"}, {name: "Guard", rules: "2024"}]}),
+	]});
+	globalThis.game.actors.fromCompendium = doc => ({name: doc.name, uuid: doc.uuid});
+	globalThis.Actor = {implementation: {create: async data => data}};
+	const source = new CompendiumSource({edition: "2024"});
+	const getPackage = actor => actor.uuid.split(".")[1];
+	for (const name of ["Wolf", "Guard"]) {
+		const actor = await source.getActor({name, ddbName: name, creatures: {"2024": {name, source: "XMM"}}}, {isStrict: true, isEditionOnly: true});
+		assert.equal(getPackage(actor), "dnd-monster-manual", name);
+	}
+	// A creature only another book has still comes from it
+	const eva = await source.getActor({name: "Madam Eva", ddbName: "Madam Eva", npc: true, creatures: {"2024": {name: "Madam Eva", source: "CoS"}}}, {isStrict: true, isEditionOnly: true});
+	assert.equal(getPackage(eva), "dnd-ravenloft-horrors-within");
+});

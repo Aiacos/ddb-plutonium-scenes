@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.6.1] - 2026-11-02
+
+### Fixed
+- Common monsters come from the **Monster Manual** when it has them, instead of a reprint in another official book: Curse of Strahd had its Giant Spiders and Wolves from the Dungeon Master's Guide, Skeletons from Forge of the Artificer and Guards, Revenants and Wights from Ravenloft: Horrors Within. Creatures only one book has (Madam Eva) still come from that book.
+
 ## [0.6.0] - 2026-11-02
 
 ### Changed

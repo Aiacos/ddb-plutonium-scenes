@@ -8,11 +8,6 @@ export const MONSTER_SOURCE = Object.freeze({
 	PLUTONIUM: "plutonium",
 });
 
-/**
- * Official Wizards of the Coast packages on Foundry, and how strongly each is preferred when a
- * creature name exists in several (adventure > rulebook > SRD). Mirrors npc-token-replacer's
- * SourceDetector whitelist; that module's selection is used instead whenever it is active.
- */
 export const EDITION = Object.freeze({
 	MODERN: "2024",
 	LEGACY: "2014",
@@ -36,10 +31,17 @@ export const MODERN_PACKAGES = new Set([
 	"dnd-deadfall",
 ]);
 
+/**
+ * Official Wizards of the Coast packages on Foundry, and how strongly each is preferred when a
+ * creature name exists in several: the Monster Manual first (a "Wolf" or "Guard" reprinted in the
+ * DMG or an adventure is still the Monster Manual's), then adventures, supplements, rulebooks and
+ * the SRD. Creatures only one book has (Madam Eva) come from that book. Mirrors npc-token-replacer's
+ * SourceDetector whitelist; that module's selection is used instead whenever it is active.
+ */
 export const OFFICIAL_PACKAGE_PRIORITY = Object.freeze({
 	"dnd5e": 1,
 	"dnd-tashas-cauldron": 1,
-	"dnd-monster-manual": 2,
+	"dnd-monster-manual": 5,
 	"dnd-players-handbook": 2,
 	"dnd-dungeon-masters-guide": 2,
 	"dnd-forge-artificer": 3,

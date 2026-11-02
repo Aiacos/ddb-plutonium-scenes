@@ -39,7 +39,7 @@ Scenes are handled once Plutonium's import has finished (a few seconds after the
 
 In compendium mode, each creature comes from the first source that has it:
 
-1. the **official compendiums**, in the chosen rules edition (the Monster Manual 2024 "Night Hag");
+1. the **official compendiums**, in the chosen rules edition: the Monster Manual first, other books for creatures it lacks (the Monster Manual 2024 "Night Hag", Horrors Within's "Madam Eva");
 2. creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder), when they are the statblock of the chosen edition: adventure NPCs such as Danika Dorakova;
 3. the NPC's own statblock in the other edition, then Plutonium's importer (with the fallback setting), then the generic statblock of any edition.
 
