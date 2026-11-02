@@ -3,6 +3,7 @@ import {ScenePopulator} from "./lib/scene-populator.js";
 import {CompendiumSource} from "./lib/compendium-source.js";
 import {SceneOrganizer} from "./lib/scene-organizer.js";
 import {ImportQueue} from "./lib/import-queue.js";
+import {ActorMerger} from "./lib/actor-merger.js";
 
 const registerSettings = () => {
 	game.settings.register(MODULE_ID, "monsterSource", {
@@ -91,6 +92,7 @@ Hooks.once("init", () => {
 		getCompendiums: () => CompendiumSource.getPacks(),
 		organize: (scene = canvas.scene) => SceneOrganizer.pOrganize(scene),
 		organizeAll: () => SceneOrganizer.pOrganizeAll(),
+		mergeDuplicates: () => ActorMerger.pMergeDuplicates(ScenePopulator.findFolder()),
 	};
 });
 

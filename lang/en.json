@@ -40,7 +40,9 @@
 			"Start": "Placing {count} DDB creatures on {scene}...",
 			"NoPlutonium": "Plutonium is not active: using official compendiums.",
 			"Queue": "Placing DDB creatures on {count} imported scenes, one at a time…",
-			"PlutoniumWarmup": "Plutonium is preparing its compendium cache for the first creature import of this session. This can take a minute or two; creatures will keep appearing on the scene."
+			"PlutoniumWarmup": "Plutonium is preparing its compendium cache for the first creature import of this session. This can take a minute or two; creatures will keep appearing on the scene.",
+			"NothingToMerge": "No duplicate creatures to merge: every creature in the module's folder is unique.",
+			"Merged": "Merged {actors} duplicate creatures into Plutonium's actors; {tokens} tokens moved."
 		},
 		"Report": {
 			"Placed": "Placed {placed}/{total} DDB creatures on <strong>{scene}</strong>.",

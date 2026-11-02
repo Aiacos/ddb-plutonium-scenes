@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0] - 2026-11-02
+
+### Added
+- `DDBPlutoniumScenes.mergeDuplicates()`: moves the tokens of creatures imported by earlier versions onto the actors Plutonium already imported for the same creature, and deletes the copies.
+- Scene data now resolves NPCs through the adventure text itself ("Prince Livid" is a gray ooze in *Out of the Abyss*), and plural names to their statblock.
+
+### Changed
+- Placing creatures again (scene context menu, `populate(scene, {force: true})`) replaces the creatures this module placed before instead of adding a second set. Tokens added by hand are kept.
+- A creature Plutonium imported is reused only when it is the statblock of the chosen **Rules edition**.
+
+### Fixed
+- Scene data: 78 more maps get DDB lights and creatures (same name and image shape, confirmed by their walls where both have some), and walls drawn past the map image are trimmed to it.
+
+### Development
+- ESLint, unit tests (`npm test`), a versioned pre-commit hook (`npm run hooks`) and a CI workflow that also publishes releases from version tags.
+
 ## [0.4.0] - 2026-11-02
 
 ### Fixed

@@ -5,7 +5,7 @@ const DEFAULT_BASE_URL = "https://raw.githubusercontent.com/Aiacos/plutonium-sce
 const PLAYER_SUFFIX = /\s*\((?:(.*?);\s*)?Player Version\)$/i;
 
 /** The DM map a player version was made from: "Map 3.2: Church", "Main Floor (Battlemap; DM Version)". */
-const getDmName = name => name.replace(PLAYER_SUFFIX, (_m, kind) => kind ? ` (${kind}; DM Version)` : "");
+export const getDmName = name => name.replace(PLAYER_SUFFIX, (_m, kind) => kind ? ` (${kind}; DM Version)` : "");
 
 /**
  * Reads the scene repository Plutonium is configured with, for scenes that do not carry this
@@ -21,7 +21,7 @@ export class SideData {
 		let url;
 		try {
 			url = game.settings.get("plutonium", "config")?.importMap?.baseSideDataUrl;
-		} catch (e) { /* Plutonium not installed */ }
+		} catch { /* Plutonium not installed */ }
 		return (url || DEFAULT_BASE_URL).replace(/\/+$/, "");
 	}
 

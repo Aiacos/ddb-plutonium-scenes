@@ -37,7 +37,7 @@ Scenes are handled once Plutonium's import has finished (a few seconds after the
 | Place creatures on scene import | on | Places creatures as soon as Plutonium creates the scene. |
 | Chapter folders | on | Files imported scenes into Book › Chapter folders. |
 
-Creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder) are reused first. Anything else is imported once into the **DDB Scene Creatures** actor folder and reused.
+Creatures Plutonium already imported into the world (for example by an adventure import, in its "Creatures" folder) are reused first, when they are the statblock of the chosen rules edition. Anything else is imported once into the **DDB Scene Creatures** actor folder and reused.
 
 Named adventure NPCs that D&D Beyond places with a generic statblock (Danika Martikov as a Commoner) use the adventure's own creature and art (Danika Dorakova) when a source has it, and the generic statblock otherwise.
 
@@ -45,12 +45,23 @@ Named adventure NPCs that D&D Beyond places with a generic statblock (Danika Mar
 
 ```js
 DDBPlutoniumScenes.populate();              // the scene on the canvas
-DDBPlutoniumScenes.populate(scene, {force: true});
+DDBPlutoniumScenes.populate(scene, {force: true}); // place again, replacing the creatures placed before
 DDBPlutoniumScenes.getTokenData();          // creature placements stored on the scene
 DDBPlutoniumScenes.getCompendiums();        // compendiums searched in compendium mode
 DDBPlutoniumScenes.organize(scene);         // file one scene into its chapter folder
 DDBPlutoniumScenes.organizeAll();           // file every scene that has chapter data
+DDBPlutoniumScenes.mergeDuplicates();       // fold copies made before v0.4.0 into Plutonium's actors
 ```
+
+## 🛠️ Development
+
+```sh
+npm install        # dev tools only (ESLint); the module itself has no dependencies
+npm run hooks      # once per clone: pre-commit runs gitleaks, lint and unit tests
+npm test           # lint + unit tests (node:test, Foundry globals mocked)
+```
+
+CI runs the same checks on every push and pull request. To release, bump `version` in `module.json`, add a `CHANGELOG.md` section and push a `vX.Y.Z` tag: CI checks the tag matches, builds the zip and publishes the GitHub release with its `module.json`.
 
 ## 📜 Licence and credits
 

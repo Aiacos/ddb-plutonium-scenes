@@ -1,0 +1,52 @@
+name: CI
+
+# Lint and unit tests on every push and pull request. A `v*` tag also builds the module zip and
+# publishes the GitHub release (zip + module.json), after checking the tag matches module.json.
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ "v*" ]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the tag matches module.json
+        run: |
+          VERSION=$(jq -r .version module.json)
+          [ "v$VERSION" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME != module.json v$VERSION"; exit 1; }
+      - name: Build
+        run: ./build.sh
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(jq -r .version module.json)
+          ZIP="releases/ddb-plutonium-scenes-v$VERSION.zip"
+          mkdir -p "$RUNNER_TEMP/manifest"
+          unzip -o "$ZIP" module.json -d "$RUNNER_TEMP/manifest"
+          # Release notes: this version's CHANGELOG section
+          awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]" {on=1; next} /^## \[/ {on=0} on' CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" "$ZIP" "$RUNNER_TEMP/manifest/module.json" \
+            --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md"

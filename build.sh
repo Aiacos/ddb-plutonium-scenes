@@ -183,5 +183,5 @@ unzip -l "releases/${OUTPUT_FILE}" | tail -n +4 | head -n -2 | while IFS= read -
     echo -e "    $line"
 done
 echo ""
-echo -e "  ${GREEN}Publish:${NC} gh release create v${VERSION} releases/${OUTPUT_FILE} <extracted module.json>"
+echo -e "  ${GREEN}Publish:${NC} git tag v${VERSION} && git push origin v${VERSION}  (CI builds and publishes the release)"
 echo ""

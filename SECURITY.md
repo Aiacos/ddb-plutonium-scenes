@@ -14,7 +14,9 @@ Report privately through GitHub: **Security → Report a vulnerability** on [Aia
 - [x] No secrets, accounts or network calls of its own. Scene data is fetched from the scene repository URL configured in **Plutonium**, by Plutonium or by `SideData` from the same URL.
 - [x] Scene data is treated as untrusted: names from it are HTML-escaped before going into the GM chat report.
 - [x] Actors come only from installed compendiums, actors already in the world, or Plutonium's own importer.
-- [x] Commits are scanned by a gitleaks pre-commit hook.
+- [x] Commits are scanned by gitleaks in the versioned pre-commit hook (`npm run hooks`), with lint and tests.
+- [x] CI runs with read-only permissions; only the release job, on `v*` tags, can write (to create the release).
+- [x] No runtime dependencies; dev tools (ESLint) never ship in the module zip.
 
 ## ⚠️ Trust boundary
 

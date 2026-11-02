@@ -1,0 +1,17 @@
+{
+	"name": "ddb-plutonium-scenes",
+	"private": true,
+	"type": "module",
+	"description": "Foundry VTT module: places DDB community creatures on Plutonium-imported scenes. Development tooling only; the module itself has no dependencies.",
+	"scripts": {
+		"lint": "eslint scripts test",
+		"test:unit": "node --test test/",
+		"test": "npm run lint && npm run test:unit",
+		"hooks": "git config core.hooksPath .githooks"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.39.1",
+		"eslint": "^9.39.1",
+		"globals": "^16.5.0"
+	}
+}

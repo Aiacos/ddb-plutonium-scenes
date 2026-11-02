@@ -20,10 +20,12 @@ export class WorldSource {
 		return game.actors.filter(a => a.flags?.plutonium?.page === BESTIARY_PAGE);
 	}
 
-	/** The 5etools creatures a token stands for: the chosen edition first. */
-	#getPicks (token) {
-		const other = this.#edition === "2024" ? "2014" : "2024";
-		return [token.creatures?.[this.#edition], token.creatures?.[other], token.creature].filter(Boolean);
+	/**
+	 * The 5etools creature the token stands for in the chosen edition. Scene data generated before
+	 * the edition choice existed has a single `creature`.
+	 */
+	#getPick (token) {
+		return token.creatures?.[this.#edition] ?? token.creature ?? null;
 	}
 
 	static #isCreature (actor, {name, source}) {
@@ -33,20 +35,16 @@ export class WorldSource {
 		return flags.source?.toLowerCase() === source.toLowerCase() && normName(actor.name) === normName(name);
 	}
 
-	/** @return {Promise<?Actor>} */
+	/**
+	 * Only the statblock of the chosen rules edition is reused: a 2014 "Ghoul" Plutonium imported
+	 * is not the 2024 one the setting asks for, and the next sources import that instead.
+	 * @return {Promise<?Actor>}
+	 */
 	async getActor (token, {isDynamicRing = false} = {}) {
-		const actors = WorldSource.#getPlutoniumActors();
-		if (!actors.length) return null;
-		const picks = this.#getPicks(token);
-
-		// The exact statblock, then the same creature from another book ("Ghoul" MM vs XMM).
-		// A named NPC never falls back to its generic statblock here: the next sources may have it.
-		let actor = picks.map(pick => actors.find(a => WorldSource.#isCreature(a, pick))).find(Boolean);
-		if (!actor && !token.npc) {
-			const names = new Set([...picks.map(it => it.name), token.ddbName].filter(Boolean).map(normName));
-			actor = actors.find(a => names.has(normName(a.name))) ?? null;
-		}
+		const pick = this.#getPick(token);
+		if (!pick) return null;
+		const actor = WorldSource.#getPlutoniumActors().find(a => WorldSource.#isCreature(a, pick)) ?? null;
 		if (actor && isDynamicRing) await PlutoniumSource.pEnsureDynamicRing(actor);
-		return actor ?? null;
+		return actor;
 	}
 }

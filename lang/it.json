@@ -40,7 +40,9 @@
 			"Start": "Posiziono {count} creature DDB su {scene}...",
 			"NoPlutonium": "Plutonium non è attivo: uso i compendi ufficiali.",
 			"Queue": "Posiziono le creature DDB su {count} scene importate, una alla volta…",
-			"PlutoniumWarmup": "Plutonium sta preparando la cache dei compendi per il primo import di creature della sessione. Può richiedere un paio di minuti; le creature continueranno ad apparire sulla scena."
+			"PlutoniumWarmup": "Plutonium sta preparando la cache dei compendi per il primo import di creature della sessione. Può richiedere un paio di minuti; le creature continueranno ad apparire sulla scena.",
+			"NothingToMerge": "Nessuna creatura duplicata da unire: ogni creatura nella cartella del modulo è unica.",
+			"Merged": "Unite {actors} creature duplicate agli attori di Plutonium; {tokens} token spostati."
 		},
 		"Report": {
 			"Placed": "Posizionate {placed}/{total} creature DDB su <strong>{scene}</strong>.",

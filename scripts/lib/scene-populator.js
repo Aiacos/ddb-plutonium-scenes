@@ -32,10 +32,14 @@ export class ScenePopulator {
 
 	static isPopulated (scene) { return !!scene?.getFlag(MODULE_ID, "populated"); }
 
-	static async #pGetFolder () {
+	/** This module's top-level actor folder, if it exists. */
+	static findFolder () {
 		const name = game.i18n.localize("DDB_PLUT.FolderName");
-		return game.folders.find(f => f.type === "Actor" && f.name === name && !f.folder)
-			?? Folder.implementation.create({name, type: "Actor"});
+		return game.folders.find(f => f.type === "Actor" && f.name === name && !f.folder) ?? null;
+	}
+
+	static async #pGetFolder () {
+		return this.findFolder() ?? Folder.implementation.create({name: game.i18n.localize("DDB_PLUT.FolderName"), type: "Actor"});
 	}
 
 	/**
@@ -102,6 +106,8 @@ export class ScenePopulator {
 		const label = game.i18n.format("DDB_PLUT.Notify.Start", {count: tokens.length, scene: scene.name});
 		const progress = this.#startProgress(label);
 		try {
+			// Placing again replaces what this module placed before, instead of stacking a second copy
+			if (force) await this.#pRemovePlaced(scene);
 			const folder = await this.#pGetFolder();
 			sources ??= this.createSources();
 
@@ -148,6 +154,12 @@ export class ScenePopulator {
 			progress.done();
 			this.#running.delete(scene.id);
 		}
+	}
+
+	/** Tokens this module placed carry `flags.<module>.ddbName`; tokens added by hand are kept. */
+	static async #pRemovePlaced (scene) {
+		const ids = scene.tokens.filter(t => t.flags?.[MODULE_ID]?.ddbName).map(t => t.id);
+		if (ids.length) await scene.deleteEmbeddedDocuments("Token", ids);
 	}
 
 	static async #pReport ({scene, placed, total, missing}) {

@@ -2,7 +2,7 @@
 	"id": "ddb-plutonium-scenes",
 	"title": "DDB Scenes for Plutonium",
 	"description": "Populates scenes imported with Plutonium with the monsters and NPCs placed by the DDB Importer community scene data, using official D&D compendiums (default) or Plutonium imports with dynamic token rings. Pair it with the Aiacos/plutonium-scenes data repository, which also adds the community lights and walls.",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"authors": [
 		{
 			"name": "Aiacos",
@@ -50,6 +50,6 @@
 	],
 	"url": "https://github.com/Aiacos/ddb-plutonium-scenes",
 	"manifest": "https://github.com/Aiacos/ddb-plutonium-scenes/releases/latest/download/module.json",
-	"download": "https://github.com/Aiacos/ddb-plutonium-scenes/releases/download/v0.4.0/ddb-plutonium-scenes-v0.4.0.zip",
+	"download": "https://github.com/Aiacos/ddb-plutonium-scenes/releases/download/v0.5.0/ddb-plutonium-scenes-v0.5.0.zip",
 	"license": "MIT"
 }

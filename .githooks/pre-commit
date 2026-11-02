@@ -1,0 +1,12 @@
+#!/bin/sh
+# Versioned pre-commit hook. Enable once per clone with: npm run hooks
+set -e
+
+# Secrets scan (same as the gitleaks hook this replaces)
+if command -v gitleaks >/dev/null 2>&1; then
+	gitleaks protect --staged --verbose || { echo "⚠️  gitleaks: possible credentials in the commit."; exit 1; }
+fi
+
+# Lint + unit tests; install dev dependencies first if needed
+[ -d node_modules ] || npm ci --silent
+npm test --silent
